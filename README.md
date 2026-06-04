@@ -413,7 +413,7 @@ Used for:
 ## Clone Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/SkillSync.git
+git clone https://github.com/Arman-next/SkillSync.git
 
 cd SkillSync
 ```

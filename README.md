@@ -1,6 +1,8 @@
 # SkillSync 🚀
 
-![SkillSync Banner](screenshots/banner.png)
+<p align="center">
+  <img src="screenshots/Banner.png" width="1000">
+</p>
 
 <div align="center">
 

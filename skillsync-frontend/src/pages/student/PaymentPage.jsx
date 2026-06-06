@@ -360,7 +360,7 @@ export default function PaymentPage() {
           </p>
           <p className="text-xs text-amber-500 mt-0.5">
             Use card:{" "}
-            <span className="font-mono font-semibold">4111 1111 1111 1111</span>{" "}
+            <span className="font-mono font-semibold">5267 3181 8797 5449</span>{" "}
             · Any future expiry · CVV: 123 · OTP: 1234
           </p>
         </div>

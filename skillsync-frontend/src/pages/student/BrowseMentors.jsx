@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../../api/axios";
+import StarRating from "../../components/StarRating";
 import useAuth from "../../hooks/useAuth";
 import useHomeNavigate from "../../hooks/useHomeNavigate";
 
@@ -365,6 +366,13 @@ export default function BrowseMentors() {
                             {mentor.experience}
                           </span>
                         )}
+                        <div className="mt-1">
+                          <StarRating
+                            value={mentor.averageRating}
+                            count={mentor.ratingCount}
+                            showCount
+                          />
+                        </div>
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0">

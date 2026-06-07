@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "../../api/axios";
+import StarRating from "../../components/StarRating";
+import useAuth from "../../hooks/useAuth";
 import useHomeNavigate from "../../hooks/useHomeNavigate";
 
 const AVATAR_COLORS = [
@@ -16,8 +18,14 @@ export default function MentorProfile() {
   const { mentorId } = useParams();
   const navigate = useNavigate();
   const goHome = useHomeNavigate();
+  const { user } = useAuth();
 
   const [mentor, setMentor] = useState(null);
+  const [ratingInfo, setRatingInfo] = useState({ canRate: false, rating: null });
+  const [selectedRating, setSelectedRating] = useState(0);
+  const [ratingComment, setRatingComment] = useState("");
+  const [ratingLoading, setRatingLoading] = useState(false);
+  const [ratingError, setRatingError] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -34,6 +42,51 @@ export default function MentorProfile() {
     };
     fetchMentor();
   }, [mentorId]);
+
+  useEffect(() => {
+    const fetchMyRating = async () => {
+      if (user?.role !== "student") return;
+
+      try {
+        const res = await axios.get(`/api/ratings/mentors/${mentorId}/my`);
+        setRatingInfo(res.data);
+        setSelectedRating(res.data.rating?.rating || 0);
+        setRatingComment(res.data.rating?.comment || "");
+      } catch (err) {
+        setRatingInfo({ canRate: false, rating: null });
+      }
+    };
+
+    fetchMyRating();
+  }, [mentorId, user?.role]);
+
+  const handleRatingSubmit = async () => {
+    if (!selectedRating) {
+      setRatingError("Please choose a star rating first.");
+      return;
+    }
+
+    setRatingLoading(true);
+    setRatingError("");
+
+    try {
+      const res = await axios.post(`/api/ratings/mentors/${mentorId}`, {
+        rating: selectedRating,
+        comment: ratingComment,
+      });
+
+      setRatingInfo((prev) => ({ ...prev, rating: res.data.rating }));
+      setMentor((prev) => ({
+        ...prev,
+        averageRating: res.data.averageRating,
+        ratingCount: res.data.ratingCount,
+      }));
+    } catch (err) {
+      setRatingError(err.response?.data?.message || "Failed to save rating.");
+    } finally {
+      setRatingLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -126,6 +179,12 @@ export default function MentorProfile() {
                   <p className="text-gray-400 text-sm mt-0.5">
                     {mentor.userId?.email}
                   </p>
+                  <div className="mt-3">
+                    <StarRating
+                      value={mentor.averageRating}
+                      count={mentor.ratingCount}
+                    />
+                  </div>
                   {mentor.experience && (
                     <span className="inline-block mt-2 text-xs font-medium bg-blue-50 text-blue-600 px-3 py-1 rounded-xl">
                       {mentor.experience} experience
@@ -153,6 +212,58 @@ export default function MentorProfile() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Rating */}
+        <div className="card-animate bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-5">
+          <h2 className="sora font-semibold text-gray-900 mb-3">
+            Student Rating
+          </h2>
+          <StarRating
+            value={mentor.averageRating}
+            count={mentor.ratingCount}
+            size="lg"
+          />
+
+          {user?.role === "student" && ratingInfo.canRate && (
+            <div className="mt-6 pt-5 border-t border-gray-100">
+              <p className="text-sm font-semibold text-gray-800 mb-3">
+                {ratingInfo.rating ? "Update your rating" : "Rate this mentor"}
+              </p>
+              <StarRating
+                value={selectedRating}
+                interactive
+                onChange={setSelectedRating}
+                size="lg"
+                showCount={false}
+              />
+              <textarea
+                value={ratingComment}
+                onChange={(e) => setRatingComment(e.target.value)}
+                maxLength={500}
+                placeholder="Optional feedback..."
+                className="mt-4 w-full min-h-24 rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 resize-none"
+              />
+              {ratingError && (
+                <p className="mt-2 text-xs font-medium text-red-500">
+                  {ratingError}
+                </p>
+              )}
+              <button
+                onClick={handleRatingSubmit}
+                disabled={ratingLoading}
+                className="mt-4 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 text-white text-sm font-semibold px-5 py-3 rounded-2xl transition-all"
+              >
+                {ratingLoading ? "Saving..." : "Save rating"}
+              </button>
+            </div>
+          )}
+
+          {user?.role === "student" && !ratingInfo.canRate && (
+            <p className="mt-4 text-xs text-gray-400">
+              Complete at least one session with this mentor to add your rating.
+            </p>
+          )}
         </div>
 
         {/* About */}

@@ -13,6 +13,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import disputeRoutes from "./routes/disputeRoutes.js";
+import ratingRoutes from "./routes/ratingRoutes.js";
 import Payment from "./models/Payment.js";
 import Session from "./models/Session.js";
 import Dispute from "./models/Dispute.js";
@@ -79,6 +80,7 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/disputes", disputeRoutes);
+app.use("/api/ratings", ratingRoutes);
 
 app.get("/", (req, res) => {
   res.send("SkillSync API running...");

@@ -400,6 +400,16 @@ export default function StudentDashboard() {
                                 >
                                   🤖 AI Summary
                                 </button>
+                                <button
+                                  onClick={() =>
+                                    navigate(
+                                      `/student/mentor/${session.mentorId?._id}`,
+                                    )
+                                  }
+                                  className="text-xs bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-3 py-1.5 rounded-xl font-medium transition-all cursor-pointer"
+                                >
+                                  Rate Mentor
+                                </button>
                               </>
                             )}
                             {canDispute && (

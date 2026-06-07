@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../../api/axios";
+import StarRating from "../../components/StarRating";
 import useAuth from "../../hooks/useAuth";
 import useHomeNavigate from "../../hooks/useHomeNavigate";
 
@@ -168,7 +169,7 @@ export default function MentorDashboard() {
         )}
 
         {/* Stats */}
-        <div className="card-animate grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div className="card-animate grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
           {[
             {
               icon: "📅",
@@ -194,6 +195,16 @@ export default function MentorDashboard() {
               value: `₹${releasedSessions.reduce((sum, s) => sum + (s.paymentAmount || s.amount || 0), 0)}`,
               color: "text-violet-600",
             },
+            {
+              icon: "5.0",
+              label: `${profile?.ratingCount || 0} rating${(profile?.ratingCount || 0) === 1 ? "" : "s"}`,
+              value:
+                (profile?.ratingCount || 0) > 0
+                  ? Number(profile.averageRating || 0).toFixed(1)
+                  : "New",
+              color: "text-amber-600",
+              rating: true,
+            },
           ].map((stat, i) => (
             <div
               key={i}
@@ -203,6 +214,15 @@ export default function MentorDashboard() {
               <p className={`sora text-xl font-bold ${stat.color}`}>
                 {stat.value}
               </p>
+              {stat.rating && (
+                <div className="mt-1">
+                  <StarRating
+                    value={profile?.averageRating}
+                    count={profile?.ratingCount}
+                    showCount={false}
+                  />
+                </div>
+              )}
               <p className="text-xs text-gray-400">{stat.label}</p>
             </div>
           ))}
